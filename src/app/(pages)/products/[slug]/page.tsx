@@ -259,7 +259,7 @@ interface Product {
   availableSizes?: string[];
 }
 
-export default function slug() {
+export default function Slug() {
   const { slug } = useParams(); // Get dynamic route parameter
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
