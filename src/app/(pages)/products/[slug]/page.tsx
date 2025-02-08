@@ -16,8 +16,7 @@
 // import picture1 from "@/../public/assets/Homepage/product-cover-5.png";
 // import pic2 from "@/../public/assets/Homepage/product-cover-5 (1).png";
 // import Link from 'next/link';
-// import { useDispatch } from 'react-redux';
-// import {add} from '../../../redux/cartslice';
+// import { addToCart } from '../../../actions/actions'; 
 
 // const fallbackImages = [picture1, pic2];
 
@@ -32,7 +31,7 @@
 //   availableSizes?: string[];
 // }
 
-// export default function slug() {
+// export default function Slug() {
 //   const { slug } = useParams(); // Get dynamic route parameter
 //   const [product, setProduct] = useState<Product | null>(null);
 //   const [loading, setLoading] = useState(true);
@@ -41,13 +40,10 @@
 //   const [quantity, setQuantity] = useState(1);
 //   const [selectedSize, setSelectedSize] = useState<string | null>(null);
 //   const [showFullDescription, setShowFullDescription] = useState<boolean>(false);
-//   const dispatch = useDispatch();
 
 //   const handleAdd = (product: Product) => {
-//     dispatch(add(product));
+//     addToCart(product); // Use addToCart instead of Redux
 //   };
-
-
 
 //   useEffect(() => {
 //     if (!slug) return;
@@ -200,11 +196,12 @@
 
 //           {/* Add to Cart */}
 //           <div className="flex items-center gap-4 mt-14">
-//             <Link href="/cart">
-//               <button  onClick={()=>handleAdd(product)}  className="px-6 py-2 bg-[#23A6F0] text-white rounded-md hover:bg-blue-600">
-//                 Add to cart
-//               </button>
-//             </Link>
+//             <button
+//               onClick={() => handleAdd(product)}
+//               className="px-6 py-2 bg-[#23A6F0] text-white rounded-md hover:bg-blue-600"
+//             >
+//               Add to cart
+//             </button>
 //             <FaHeart className="text-gray-700 text-2xl cursor-pointer" />
 //             <Link href="/cart">
 //               <FaShoppingCart className="text-gray-700 text-2xl cursor-pointer" />
@@ -222,8 +219,6 @@
 //     </main>
 //   );
 // }
-
-
 
 
 'use client';
@@ -245,19 +240,9 @@ import picture1 from "@/../public/assets/Homepage/product-cover-5.png";
 import pic2 from "@/../public/assets/Homepage/product-cover-5 (1).png";
 import Link from 'next/link';
 import { addToCart } from '../../../actions/actions'; 
+import { Product } from '@/app/types/product'; // Ensure correct type import
 
 const fallbackImages = [picture1, pic2];
-
-interface Product {
-  _id: string;
-  title: string;
-  imageUrl: string | null;
-  price: number;
-  description: string;
-  tags: string[];
-  dicountPercentage?: number;
-  availableSizes?: string[];
-}
 
 export default function Slug() {
   const { slug } = useParams(); // Get dynamic route parameter
@@ -270,7 +255,7 @@ export default function Slug() {
   const [showFullDescription, setShowFullDescription] = useState<boolean>(false);
 
   const handleAdd = (product: Product) => {
-    addToCart(product); // Use addToCart instead of Redux
+    addToCart(product); 
   };
 
   useEffect(() => {
@@ -281,9 +266,13 @@ export default function Slug() {
         const data = await client.fetch<Product[]>(`
           *[_type == "product" && _id == "${slug}"]{
             _id,
+            _type,
+            name,
             title,
             "imageUrl": productImage.asset->url,
+            originalPrice,
             price,
+            rating,
             description,
             tags,
             dicountPercentage,
@@ -337,108 +326,40 @@ export default function Slug() {
       <AnnouncementBar bgColor="#23856D" />
       <Header />
       <ProductsNavbar />
-
       <div className="container w-full md:w-[85%] relative mx-auto px-4 py-12 flex flex-col md:flex-row gap-14 font-Montserrat">
-        {/* Left Section - Image Slider */}
         <div className="flex-1">
           <div className="relative">
-            <Image
-              src={displayedImage}
-              alt="Product Image"
-              className="rounded-lg h-[600px]"
-              width={600}
-              height={400}
-            />
-            <button
-              onClick={handlePreviousImage}
-              className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-gray-200 rounded-full p-2"
-            >
+            <Image src={displayedImage} alt="Product Image" className="rounded-lg h-[600px]" width={600} height={400} />
+            <button onClick={handlePreviousImage} className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-gray-200 rounded-full p-2">
               <FaChevronLeft className="text-gray-700" />
             </button>
-            <button
-              onClick={handleNextImage}
-              className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-gray-200 rounded-full p-2"
-            >
+            <button onClick={handleNextImage} className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-gray-200 rounded-full p-2">
               <FaChevronRight className="text-gray-700" />
             </button>
           </div>
         </div>
-
-        {/* Right Section - Product Details */}
         <div className="flex-1">
           <h1 className="text-3xl font-semibold text-gray-800 mb-5">{product.title}</h1>
-          <p className="text-xl font-Montserrat font-semibold text-black mt-4">${product.price}</p>
-          <p className="text-sm text-gray-500 mt-2">
-            Availability: <span className="text-[#23A6F0] font-medium">In Stock</span>
-          </p>
-
-          {/* Size Selector */}
-          {product.availableSizes && product.availableSizes.length > 0 && (
+          <p className="text-xl font-semibold text-black mt-4">${product.price}</p>
+          <p className="text-sm text-gray-500 mt-2">Availability: <span className="text-[#23A6F0] font-medium">In Stock</span></p>
+          {product.availableSizes?.length > 0 && (
             <div className="mt-6">
               <label className="block text-gray-700 font-medium mb-2">Size:</label>
-              <select
-                className="border rounded-md p-2 w-40"
-                value={selectedSize || ''}
-                onChange={(e) => setSelectedSize(e.target.value)}
-              >
+              <select className="border rounded-md p-2 w-40" value={selectedSize || ''} onChange={(e) => setSelectedSize(e.target.value)}>
                 {product.availableSizes.map((size) => (
-                  <option key={size} value={size}>
-                    {size}
-                  </option>
+                  <option key={size} value={size}>{size}</option>
                 ))}
               </select>
             </div>
           )}
-
-          {/* Quantity Selector */}
-          <div className="mt-6 flex flex-col md:flex-row items-center">
-            <label className="block text-gray-700 font-medium mr-4">Quantity:</label>
-            <div className="flex items-center border rounded-md">
-              <button
-                onClick={() => handleQuantityChange(false)}
-                className="px-4 py-2 bg-gray-200 hover:bg-gray-300"
-              >
-                -
-              </button>
-              <span className="px-6">{quantity}</span>
-              <button
-                onClick={() => handleQuantityChange(true)}
-                className="px-4 py-2 bg-gray-200 hover:bg-gray-300"
-              >
-                +
-              </button>
-            </div>
-          </div>
-
-          <p className="text-gray-700 text-1xl py-6 border-b-2 border-gray w-full md:w-[85%]">
-            {showFullDescription
-              ? product.description
-              : truncateText(product.description, 35)}
-          </p>
-          <button
-            onClick={() => setShowFullDescription(!showFullDescription)}
-            className="text-[#23A6F0] mt-2 underline"
-          >
-            {showFullDescription ? 'Show Less' : 'Show More'}
-          </button>
-
-          {/* Add to Cart */}
           <div className="flex items-center gap-4 mt-14">
-            <button
-              onClick={() => handleAdd(product)}
-              className="px-6 py-2 bg-[#23A6F0] text-white rounded-md hover:bg-blue-600"
-            >
-              Add to cart
-            </button>
+            <button onClick={() => handleAdd(product)} className="px-6 py-2 bg-[#23A6F0] text-white rounded-md hover:bg-blue-600">Add to cart</button>
             <FaHeart className="text-gray-700 text-2xl cursor-pointer" />
-            <Link href="/cart">
-              <FaShoppingCart className="text-gray-700 text-2xl cursor-pointer" />
-            </Link>
+            <Link href="/cart"><FaShoppingCart className="text-gray-700 text-2xl cursor-pointer" /></Link>
             <FaEye className="text-gray-700 text-2xl cursor-pointer" />
           </div>
         </div>
       </div>
-
       <List />
       <Bestseller />
       <BrandLogoCards />
