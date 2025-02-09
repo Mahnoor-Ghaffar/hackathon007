@@ -240,7 +240,7 @@ import picture1 from '@/../public/assets/Homepage/product-cover-5.png';
 import pic2 from '@/../public/assets/Homepage/product-cover-5 (1).png';
 import Link from 'next/link';
 import { addToCart } from '../../../actions/actions';
-import { Product } from '../../../types/product';
+import { Product } from '@/app/types/product';
 
 const fallbackImages = [picture1, pic2];
 
@@ -251,8 +251,11 @@ export default function Slug() {
   const [error, setError] = useState<string | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [showFullDescription, setShowFullDescription] = useState(false);
+
+  const handleAdd = (product: Product) => {
+    addToCart(product);
+  };
 
   useEffect(() => {
     if (!slug) return;
@@ -267,15 +270,13 @@ export default function Slug() {
             price,
             description,
             tags,
-            dicountPercentage,
-            availableSizes
+            dicountPercentage
           }`,
           { slug }
         );
 
         if (data.length > 0) {
           setProduct(data[0]);
-          setSelectedSize(data[0].availableSizes?.[0] || null);
         } else {
           setError('Product not found');
         }
@@ -313,18 +314,7 @@ export default function Slug() {
           <p className="text-xl font-Montserrat font-semibold text-black mt-4">${product.price}</p>
           <p className="text-sm text-gray-500 mt-2">Availability: <span className="text-[#23A6F0] font-medium">In Stock</span></p>
 
-          {product.availableSizes && product.availableSizes.length > 0 && (
-            <div className="mt-6">
-              <label className="block text-gray-700 font-medium mb-2">Size:</label>
-              <select className="border rounded-md p-2 w-40" value={selectedSize || ''} onChange={(e) => setSelectedSize(e.target.value)}>
-                {product.availableSizes.map((size) => (
-                  <option key={size} value={size}>{size}</option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          <button onClick={() => addToCart(product)} className="px-6 py-2 bg-[#23A6F0] text-white rounded-md hover:bg-blue-600 mt-6">Add to cart</button>
+          <button onClick={() => handleAdd(product)} className="px-6 py-2 bg-[#23A6F0] text-white rounded-md hover:bg-blue-600 mt-6">Add to cart</button>
         </div>
       </div>
 
