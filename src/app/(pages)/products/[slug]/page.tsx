@@ -240,7 +240,7 @@ import picture1 from '@/../public/assets/Homepage/product-cover-5.png';
 import pic2 from '@/../public/assets/Homepage/product-cover-5 (1).png';
 import Link from 'next/link';
 import { addToCart } from '../../../actions/actions';
-import { Product } from '@/app/types/product';
+import { Product } from '../../../types/product';
 
 const fallbackImages = [picture1, pic2];
 
@@ -253,10 +253,6 @@ export default function Slug() {
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [showFullDescription, setShowFullDescription] = useState(false);
-
-  const handleAdd = (product: Product) => {
-    addToCart(product);
-  };
 
   useEffect(() => {
     if (!slug) return;
@@ -279,7 +275,7 @@ export default function Slug() {
 
         if (data.length > 0) {
           setProduct(data[0]);
-          setSelectedSize(data[0].availableSizes ? data[0].availableSizes[0] : null);
+          setSelectedSize(data[0].availableSizes?.[0] || null);
         } else {
           setError('Product not found');
         }
@@ -328,7 +324,7 @@ export default function Slug() {
             </div>
           )}
 
-          <button onClick={() => handleAdd(product)} className="px-6 py-2 bg-[#23A6F0] text-white rounded-md hover:bg-blue-600 mt-6">Add to cart</button>
+          <button onClick={() => addToCart(product)} className="px-6 py-2 bg-[#23A6F0] text-white rounded-md hover:bg-blue-600 mt-6">Add to cart</button>
         </div>
       </div>
 
