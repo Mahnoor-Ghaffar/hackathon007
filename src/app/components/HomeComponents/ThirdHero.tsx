@@ -80,17 +80,19 @@ const ThirdHero: React.FC = () => {
         const product = {
             _id: 'hero-product-002',
             title: 'Neural Universe Product',
-            imageUrl: HeroImg.src,
+            imageUrl: HeroImg.src, // ✅ Convert StaticImageData to string
             price: 20.99,
             description: 'Explore the future with our Neural Universe collection.',
             tags: ['neural', 'universe', 'future'],
             discountPercentage: 0,
             availableSizes: ['S', 'M', 'L', 'XL'],
+            quantity: 1,
         };
         
         dispatch(add(product)); // Add to cart
         router.push('/cart'); // Navigate to cart page
     };
+    
 
     return (
         <section className="w-full flex flex-col min-h-[630px] justify-center items-center">

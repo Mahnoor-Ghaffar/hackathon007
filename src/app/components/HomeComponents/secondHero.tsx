@@ -13,19 +13,21 @@ const SecondHero: React.FC = () => {
 
     const handleAddToCart = () => {
         const product = {
-            _id: 'hero-product-001',
-            title: 'Vita Classic Product',
-            imageUrl: HeroImg.src,
-            price: 16.48,
-            description: 'We know how large objects will act, We know how our objects will act.',
-            tags: ['classic', 'summer 2020'],
-            dicountPercentage: 0,
-            availableSizes: ['M', 'L', 'XL'],
+            _id: 'hero-product-002',
+            title: 'Neural Universe Product',
+            imageUrl: HeroImg.src, // ✅ Convert StaticImageData to string
+            price: 20.99,
+            description: 'Explore the future with our Neural Universe collection.',
+            tags: ['neural', 'universe', 'future'],
+            discountPercentage: 0,
+            availableSizes: ['S', 'M', 'L', 'XL'],
+            quantity: 1,
         };
-
+        
         dispatch(add(product)); // Add to cart
         router.push('/cart'); // Navigate to cart page
     };
+
 
     return (
         <section
